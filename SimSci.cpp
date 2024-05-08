@@ -132,7 +132,7 @@ void SimSci(string modus){
     TVector3 x0,d;
 
     double w = 1;
-    double theta=0,phi=0,alpha=0,costh=0;
+    double theta=0,phi=0,alpha=0,costh=1;
     if (modus=="detsimple"){
       theta = 0; 
       phi   = 0;
