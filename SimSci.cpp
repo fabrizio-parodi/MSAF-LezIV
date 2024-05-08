@@ -125,7 +125,8 @@ void SimSci(string modus){
   
   par::geo->Draw();  
 
-  TH1D *hE = new TH1D("hE","",100,0,1.0);
+  TH1D *hEt = new TH1D("Etrue","",100,0,1.0);
+  TH1D *hEm = new TH1D("Emeas","",100,0,1.0);
   TStopwatch tstop;
 
   for (int iev=0;iev<par::nev;iev++){
@@ -152,28 +153,30 @@ void SimSci(string modus){
     
     par::geo->Event(x0);
     double Edep  = CalcEnergyDeposition(x0,d,par::en,w,modus);
+    hEt->Fill(Edep,w);
     if (Edep!=0){
       double Emeas = par::rnd->Gaus(Edep,sqrt(0.02*0.02+0.04*0.04/Edep)*Edep);
-      hE->Fill(Emeas,w);
+      hEm->Fill(Emeas,w);
     }
   }
 
   double time = tstop.CpuTime();
   double eval;
-  double val = hE->IntegralAndError(hE->GetXaxis()->FindBin(0.35),hE->GetXaxis()->FindBin(0.4),eval);
-  val  = val/hE->Integral();
-  eval = eval/hE->Integral();
+  double val = hEm->IntegralAndError(hEm->GetXaxis()->FindBin(0.35),hEm->GetXaxis()->FindBin(0.4),eval);
+  val  = val/hEm->Integral();
+  eval = eval/hEm->Integral();
   std::cout << "FOM " << 1/(time*pow(eval/val,2)) << std::endl;
   
   TCanvas *c = new TCanvas("h","Energy",620,10,320,320);
   c->Draw();
 
   gStyle->SetOptStat("111111");
-  hE->Draw("E");
+  hEm->Draw("E");
   
   string file="output_"; file+=modus; file+=".root";
   TFile f(file.c_str(),"recreate");
-  hE->Write();
+  hEm->Write();
+  hEt->Write();
   f.Close();
 
 }
